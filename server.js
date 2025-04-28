@@ -1,20 +1,22 @@
+// 💎 1. ENV Yükle → Her şeyden önce!
+require('dotenv').config();
 console.log('server.js başlıyor...');
 
+// 💎 2. Temel modülleri yükle
 const express = require('express');
 const app = express();
-require('dotenv').config();
 
-// Middleware → JSON body parse
+// 💎 3. JSON body parse middleware → Router’dan önce olmalı!
 app.use(express.json());
 
-// Veritabanı Bağlantıları
-const db = require('./config/db');           // MySQL
-const connectMongo = require('./config/mongo');  // MongoDB
+// 💎 4. Veritabanı Bağlantıları
+const db = require('./config/db');               // MySQL bağlantısı
+const connectMongo = require('./config/mongo');  // MongoDB bağlantısı
 
-// MongoDB bağlantısını başlat
+// 💎 5. MongoDB bağlantısını başlat
 connectMongo();
 
-// Test Routes
+// 💎 6. Test Routes → burada kalabilir!
 app.get('/', (req, res) => {
   res.send('Hybrid E-Commerce System Running!');
 });
@@ -28,10 +30,20 @@ app.get('/test-mysql', async (req, res) => {
   }
 });
 
-// Auth Routes
+app.get('/test-mongo', (req, res) => {
+  res.send('MongoDB working!');
+});
+
+// 💎 7. Auth Routes → JSON parse’tan sonra, en sonda olmalı!
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
-// Port
+// 💎 8. Port Ayarları
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const cartRoutes = require('./routes/cart');
+app.use('/api/cart', cartRoutes);
+
+const productRoutes = require('./routes/product');
+app.use('/api/products', productRoutes);
